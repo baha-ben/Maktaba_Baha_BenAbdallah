@@ -3,10 +3,19 @@ package com.ElOuedUniv.maktaba.presentation.screens
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+// ============ ADDED: Import for search icon ============
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
+// ============ END ADDED ============
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+// ============ ADDED: Imports for search state management ============
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+// ============ END ADDED ============
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -24,6 +33,22 @@ fun BookListScreen(
 ) {
     val books by viewModel.books.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
+    // ============ ADDED: Collect total pages from ViewModel ============
+    val totalPages by viewModel.totalPages.collectAsState()
+    // ============ END ADDED ============
+    // ============ ADDED: Search query state ============
+    var searchQuery by remember { mutableStateOf("") }
+    // ============ END ADDED ============
+
+    // ============ ADDED: Filter books based on search query ============
+    val filteredBooks = remember(books, searchQuery) {
+        if (searchQuery.isEmpty()) {
+            books
+        } else {
+            books.filter { it.title.contains(searchQuery, ignoreCase = true) }
+        }
+    }
+    // ============ END ADDED ============
 
     Scaffold(
         topBar = {
@@ -34,30 +59,72 @@ fun BookListScreen(
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             )
+
         }
     ) { paddingValues ->
-        Box(
+        // ============ ADDED: Changed Box to Column to add search field ============
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            if (isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            } else {
-                if (books.isEmpty()) {
-                    EmptyBooksMessage(
+            // ============ ADDED: Book Counter ============
+            Text(
+                text = "Total Books: ${books.size}",
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
+            // ============ END ADDED ============
+
+            // ============ ADDED: Total Pages Counter ============
+            Text(
+                text = "Total Pages: $totalPages",
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.secondary
+            )
+            // ============ END ADDED ============
+
+            // ============ ADDED: Search TextField ============
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                placeholder = { Text("Search by book title...") },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
+                singleLine = true
+            )
+            // ============ END ADDED ============
+
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                if (isLoading) {
+                    CircularProgressIndicator(
                         modifier = Modifier.align(Alignment.Center)
                     )
                 } else {
-                    BookList(
-                        books = books,
-                        modifier = Modifier.fillMaxSize()
-                    )
+                    // ============ MODIFIED: Use filteredBooks instead of books ============
+                    if (filteredBooks.isEmpty()) {
+                        EmptyBooksMessage(
+                            modifier = Modifier.align(Alignment.Center)
+                        )
+                    } else {
+                        BookList(
+                            books = filteredBooks,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
+                    // ============ END MODIFIED ============
                 }
             }
         }
+        // ============ END ADDED ============
     }
 }
 
@@ -99,9 +166,19 @@ fun BookItem(book: Book) {
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
-            
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            // ============ ADDED: Author field ============
+            Text(
+                text = "Author: ${if (book.author.isEmpty()) "Not set" else book.author}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            // ============ END ADDED ============
+
             Spacer(modifier = Modifier.height(8.dp))
-            
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
@@ -117,7 +194,7 @@ fun BookItem(book: Book) {
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
-                
+
                 Column(horizontalAlignment = Alignment.End) {
                     Text(
                         text = "Pages:",
