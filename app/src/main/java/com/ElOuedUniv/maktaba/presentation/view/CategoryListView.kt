@@ -44,28 +44,44 @@ fun CategoryListView(
             )
         }
     ) { paddingValues ->
-        Box(
+        // ============ MODIFIED: Changed Box to Column to add category counter ============
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            if (isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            } else {
-                if (categories.isEmpty()) {
-                    EmptyCategoriesMessage(
+            // ============ ADDED: Bonus 1 - Category Counter ============
+            Text(
+                text = "Total Categories: ${categories.size}",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(16.dp)
+            )
+            // ============ END ADDED ============
+
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                if (isLoading) {
+                    CircularProgressIndicator(
                         modifier = Modifier.align(Alignment.Center)
                     )
                 } else {
-                    CategoryList(
-                        categories = categories,
-                        modifier = Modifier.fillMaxSize()
-                    )
+                    if (categories.isEmpty()) {
+                        EmptyCategoriesMessage(
+                            modifier = Modifier.align(Alignment.Center)
+                        )
+                    } else {
+                        CategoryList(
+                            categories = categories,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
                 }
             }
         }
+        // ============ END MODIFIED ============
     }
 }
 
@@ -97,9 +113,17 @@ fun CategoryItem(category: Category) {
                 .padding(16.dp)
         ) {
             Text(
-                text = "Category Item",
+                text = category.name,
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = category.description,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }
