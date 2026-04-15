@@ -25,6 +25,16 @@ class CategoryRepositoryImpl @Inject constructor() : CategoryRepository {
             id = "3",
             name = "Databases",
             description = "Books about database design and management"
+        ),
+        Category(
+            id = "4",
+            name = "Operating Systems",
+            description = "Books about operating system concepts, processes, memory management, and scheduling"
+        ),
+        Category(
+            id = "5",
+            name = "Computer Networks",
+            description = "Books about networking concepts, protocols, and communication between computers"
         )
     )
 

@@ -10,11 +10,12 @@ import androidx.compose.ui.window.Dialog
 @Composable
 fun AddBookDialog(
     onDismiss: () -> Unit,
-    onConfirm: (title: String, isbn: String, nbPages: Int) -> Unit
+    onConfirm: (title: String, isbn: String, nbPages: Int, author: String) -> Unit
 ) {
     var title by remember { mutableStateOf("") }
     var isbn by remember { mutableStateOf("") }
     var nbPages by remember { mutableStateOf("") }
+    var author by remember { mutableStateOf("") }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -42,12 +43,18 @@ fun AddBookDialog(
                     label = { Text("Number of Pages") },
                     modifier = Modifier.fillMaxWidth()
                 )
+                OutlinedTextField(
+                    value = author,
+                    onValueChange = { author = it },
+                    label = { Text("Author") },
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
         },
         confirmButton = {
             Button(
                 onClick = {
-                    onConfirm(title, isbn, nbPages.toIntOrNull() ?: 0)
+                    onConfirm(title, isbn, nbPages.toIntOrNull() ?: 0, author)
                 }
             ) {
                 Text("Confirm")

@@ -10,5 +10,11 @@ sealed interface BookUiAction {
     object RefreshBooks : BookUiAction
     object OnAddBookClick : BookUiAction
     object OnDismissAddBook : BookUiAction
-    data class OnAddBookConfirm(val title: String, val isbn: String, val nbPages: Int) : BookUiAction
+    data class OnAddBookConfirm(
+        val title: String,
+        val isbn: String,
+        val nbPages: Int,
+        val author: String
+    ) : BookUiAction
+    data class OnSearchQueryChange(val query: String) : BookUiAction
 }

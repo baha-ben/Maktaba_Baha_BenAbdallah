@@ -6,10 +6,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -17,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ElOuedUniv.maktaba.data.model.Book
 import com.ElOuedUniv.maktaba.presentation.book.BookViewModel
+import kotlinx.coroutines.flow.collect
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -24,22 +28,45 @@ fun BookListView(
     onCategoriesClick: () -> Unit = {},
     viewModel: BookViewModel = hiltViewModel()
 ) {
-    val books by viewModel.books.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
-    
-    // TODO: Exercise 3 - Use a single delegated state from the ViewModel
-    // val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val filteredBooks = remember(uiState.books, uiState.searchQuery) {
+        if (uiState.searchQuery.isBlank()) {
+            uiState.books
+        } else {
+            uiState.books.filter { it.title.contains(uiState.searchQuery, ignoreCase = true) }
+        }
+    }
 
-    if (/* TODO: uiState.isAddingBook */ false) {
+    LaunchedEffect(viewModel) {
+        viewModel.uiEvent.collect { event ->
+            when (event) {
+                is BookUiEvent.ShowSnackbar -> snackbarHostState.showSnackbar(event.message)
+                BookUiEvent.NavigateToCategories -> onCategoriesClick()
+            }
+        }
+    }
+
+    if (uiState.isAddingBook) {
         AddBookDialog(
-            onDismiss = { /* TODO: viewModel.onAction(BookUiAction.OnDismissAddBook) */ },
-            onConfirm = { title, isbn, pages ->
-                /* TODO: viewModel.onAction(BookUiAction.OnAddBookConfirm(title, isbn, pages)) */
+            onDismiss = { viewModel.onAction(BookUiAction.OnDismissAddBook) },
+            onConfirm = { title, isbn, pages, author ->
+                viewModel.onAction(
+                    BookUiAction.OnAddBookConfirm(
+                        title = title,
+                        isbn = isbn,
+                        nbPages = pages,
+                        author = author
+                    )
+                )
             }
         )
     }
 
     Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        },
         topBar = {
             TopAppBar(
                 title = { Text("Maktaba - My Library") },
@@ -58,35 +85,69 @@ fun BookListView(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { 
-                /* TODO: Exercise 3 - viewModel.onAction(BookUiAction.OnAddBookClick) */
-            }) {
+            FloatingActionButton(onClick = { viewModel.onAction(BookUiAction.OnAddBookClick) }) {
                 Icon(
-                    imageVector = androidx.compose.material.icons.Icons.Default.Add,
+                    imageVector = Icons.Default.Add,
                     contentDescription = "Add Book"
                 )
             }
         }
     ) { paddingValues ->
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            if (isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            } else {
-                if (books.isEmpty()) {
-                    EmptyBooksMessage(
+            Text(
+                text = "Total Books: ${uiState.books.size}",
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
+
+            Text(
+                text = "Total Pages: ${uiState.totalPages}",
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.secondary
+            )
+
+            OutlinedTextField(
+                value = uiState.searchQuery,
+                onValueChange = { viewModel.onAction(BookUiAction.OnSearchQueryChange(it)) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                placeholder = { Text("Search by book title...") },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "Search"
+                    )
+                },
+                singleLine = true
+            )
+
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                if (uiState.isLoading) {
+                    CircularProgressIndicator(
                         modifier = Modifier.align(Alignment.Center)
                     )
                 } else {
-                    BookList(
-                        books = books,
-                        modifier = Modifier.fillMaxSize()
-                    )
+                    if (filteredBooks.isEmpty()) {
+                        EmptyBooksMessage(
+                            modifier = Modifier.align(Alignment.Center)
+                        )
+                    } else {
+                        BookList(
+                            books = filteredBooks,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
                 }
             }
         }
@@ -124,6 +185,14 @@ fun BookItem(book: Book) {
                 text = book.title,
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
+            )
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Text(
+                text = "Author: ${if (book.author.isBlank()) "Not set" else book.author}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             
             Spacer(modifier = Modifier.height(8.dp))
@@ -184,4 +253,3 @@ fun EmptyBooksMessage(modifier: Modifier = Modifier) {
         )
     }
 }
-

@@ -45,25 +45,37 @@ fun CategoryListView(
             )
         }
     ) { paddingValues ->
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            if (isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            } else {
-                if (categories.isEmpty()) {
-                    EmptyCategoriesMessage(
+            Text(
+                text = "Total Categories: ${categories.size}",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(16.dp)
+            )
+
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                if (isLoading) {
+                    CircularProgressIndicator(
                         modifier = Modifier.align(Alignment.Center)
                     )
                 } else {
-                    CategoryList(
-                        categories = categories,
-                        modifier = Modifier.fillMaxSize()
-                    )
+                    if (categories.isEmpty()) {
+                        EmptyCategoriesMessage(
+                            modifier = Modifier.align(Alignment.Center)
+                        )
+                    } else {
+                        CategoryList(
+                            categories = categories,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
                 }
             }
         }
