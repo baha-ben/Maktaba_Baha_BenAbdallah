@@ -4,5 +4,6 @@ data class Book(
     val isbn: String,
     val title: String,
     val nbPages: Int,
-    val author: String
+    val author: String,
+    val imageUrl: String? = null
 )

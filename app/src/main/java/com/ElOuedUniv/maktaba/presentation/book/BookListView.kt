@@ -1,8 +1,11 @@
 package com.ElOuedUniv.maktaba.presentation.book
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
@@ -15,12 +18,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ElOuedUniv.maktaba.data.model.Book
-import com.ElOuedUniv.maktaba.presentation.book.BookViewModel
-import kotlinx.coroutines.flow.collect
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,29 +56,13 @@ fun BookListView(
         }
     }
 
-    if (uiState.isAddingBook) {
-        AddBookDialog(
-            onDismiss = { viewModel.onAction(BookUiAction.OnDismissAddBook) },
-            onConfirm = { title, isbn, pages, author ->
-                viewModel.onAction(
-                    BookUiAction.OnAddBookConfirm(
-                        title = title,
-                        isbn = isbn,
-                        nbPages = pages,
-                        author = author
-                    )
-                )
-            }
-        )
-    }
-
     Scaffold(
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
         },
         topBar = {
             TopAppBar(
-                title = { Text("Maktaba - My Library") },
+                title = { Text("My Library") },
                 actions = {
                     IconButton(onClick = onCategoriesClick) {
                         Icon(
@@ -87,7 +78,7 @@ fun BookListView(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { viewModel.onAction(BookUiAction.OnAddBookClick) }) {
+            FloatingActionButton(onClick = onAddBookClick) {
                 Icon(
                     imageVector = Icons.Default.Add,
                     contentDescription = "Add Book"
@@ -101,19 +92,11 @@ fun BookListView(
                 .padding(paddingValues)
         ) {
             Text(
-                text = "Total Books: ${uiState.books.size}",
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
-            )
-
-            Text(
-                text = "Total Pages: ${uiState.totalPages}",
+                text = "${uiState.books.size} books • ${uiState.totalPages} pages",
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.secondary
+                color = MaterialTheme.colorScheme.primary
             )
 
             OutlinedTextField(
@@ -147,6 +130,7 @@ fun BookListView(
                     } else {
                         BookList(
                             books = filteredBooks,
+                            onBookClick = onBookClick,
                             modifier = Modifier.fillMaxSize()
                         )
                     }
@@ -162,73 +146,98 @@ fun BookList(
     onBookClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    LazyColumn(
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(2),
         modifier = modifier,
         contentPadding = PaddingValues(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         items(books) { book ->
-            BookItem(book = book, onClick = { onBookClick(book.isbn) })
+            BookCard(book = book, onClick = { onBookClick(book.isbn) })
         }
     }
 }
 
 @Composable
-fun BookItem(book: Book, onClick: () -> Unit) {
+fun BookCard(book: Book, onClick: () -> Unit) {
+    val readingInfo = remember(book) { book.readingInfo() }
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         onClick = onClick,
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        shape = RoundedCornerShape(24.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(0.72f)
+                    .clip(RoundedCornerShape(18.dp))
+                    .background(MaterialTheme.colorScheme.secondaryContainer),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = book.coverLabel(),
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            Spacer(modifier = Modifier.height(14.dp))
+
             Text(
                 text = book.title,
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
             )
 
             Spacer(modifier = Modifier.height(4.dp))
 
             Text(
-                text = "Author: ${if (book.author.isBlank()) "Not set" else book.author}",
+                text = "ISBN: ${book.isbn}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            Text(
+                text = "Pages: ${book.nbPages}",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             Spacer(modifier = Modifier.height(8.dp))
-            
-            Row(
+
+            AssistChip(
+                onClick = onClick,
+                label = { Text("Status: ${readingInfo.status}") }
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            LinearProgressIndicator(
+                progress = { readingInfo.progressPercent / 100f },
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-              ) {
-                Column {
-                    Text(
-                        text = "ISBN:",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Text(
-                        text = if (book.isbn.isEmpty()) "Not set" else book.isbn,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-                
-                Column(horizontalAlignment = Alignment.End) {
-                    Text(
-                        text = "Pages:",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Text(
-                        text = if (book.nbPages == 0) "Not set" else "${book.nbPages}",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-            }
+                color = MaterialTheme.colorScheme.primary,
+                trackColor = MaterialTheme.colorScheme.surfaceVariant
+            )
+
+            Spacer(modifier = Modifier.height(6.dp))
+
+            Text(
+                text = "${readingInfo.progressPercent}% progress",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }
@@ -240,18 +249,13 @@ fun EmptyBooksMessage(modifier: Modifier = Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "📚",
-            style = MaterialTheme.typography.displayLarge
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
             text = "No books in your library",
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "Click the + button to add a new book",
+            text = "Add your first book to populate the library grid.",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )

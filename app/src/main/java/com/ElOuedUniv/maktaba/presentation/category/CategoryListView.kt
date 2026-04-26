@@ -3,19 +3,26 @@ package com.ElOuedUniv.maktaba.presentation.category
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Category
+import androidx.compose.material.icons.filled.Code
+import androidx.compose.material.icons.filled.Memory
+import androidx.compose.material.icons.filled.Router
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Storage
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ElOuedUniv.maktaba.data.model.Category
-import com.ElOuedUniv.maktaba.presentation.category.CategoryViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -102,26 +109,45 @@ fun CategoryList(
 fun CategoryItem(category: Category) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        shape = RoundedCornerShape(24.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
     ) {
-        Column(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(18.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = category.name,
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
-            )
-            
-            Spacer(modifier = Modifier.height(8.dp))
-            
-            Text(
-                text = category.description,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            Surface(
+                shape = RoundedCornerShape(20.dp),
+                color = MaterialTheme.colorScheme.secondaryContainer
+            ) {
+                Icon(
+                    imageVector = getCategoryIcon(category.name),
+                    contentDescription = null,
+                    modifier = Modifier.padding(16.dp),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = category.name,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                Text(
+                    text = category.description,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         }
     }
 }
@@ -144,9 +170,20 @@ fun EmptyCategoriesMessage(modifier: Modifier = Modifier) {
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "Complete the TODO exercises in TP2",
+            text = "Categories will appear here when available.",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
+    }
+}
+
+fun getCategoryIcon(name: String): ImageVector {
+    return when (name.lowercase()) {
+        "programming" -> Icons.Default.Code
+        "algorithms" -> Icons.Default.Memory
+        "databases" -> Icons.Default.Storage
+        "operating systems" -> Icons.Default.Settings
+        "computer networks" -> Icons.Default.Router
+        else -> Icons.Default.Category
     }
 }

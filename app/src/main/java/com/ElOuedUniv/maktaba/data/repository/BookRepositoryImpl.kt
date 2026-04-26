@@ -15,61 +15,71 @@ class BookRepositoryImpl @Inject constructor() : BookRepository {
             isbn = "978-0-13-235088-4",
             title = "Clean Code",
             nbPages = 431,
-            author = "Robert C. Martin"
+            author = "Robert C. Martin",
+            imageUrl = null
         ),
         Book(
             isbn = "978-0-13-595705-9",
             title = "The Pragmatic Programmer",
             nbPages = 320,
-            author = "Andrew Hunt & David Thomas"
+            author = "Andrew Hunt & David Thomas",
+            imageUrl = null
         ),
         Book(
             isbn = "978-0-201-63361-0",
             title = "Design Patterns",
             nbPages = 395,
-            author = "Erich Gamma, Richard Helm, Ralph Johnson"
+            author = "Erich Gamma, Richard Helm, Ralph Johnson",
+            imageUrl = null
         ),
         Book(
             isbn = "978-0-13-475759-9",
             title = "Refactoring",
             nbPages = 448,
-            author = "Martin Fowler"
+            author = "Martin Fowler",
+            imageUrl = null
         ),
         Book(
             isbn = "978-1-492-07799-2",
             title = "Head First Design Patterns",
             nbPages = 672,
-            author = "Eric Freeman & Elisabeth Robson"
+            author = "Eric Freeman & Elisabeth Robson",
+            imageUrl = null
         ),
         Book(
             isbn = "978-0-262-04630-5",
             title = "Introduction to Algorithms",
             nbPages = 1312,
-            author = "Thomas H. Cormen, Charles E. Leiserson, Ronald L. Rivest"
+            author = "Thomas H. Cormen, Charles E. Leiserson, Ronald L. Rivest",
+            imageUrl = null
         ),
         Book(
             isbn = "978-0-13-434001-2",
             title = "How to Solve It by Computer",
             nbPages = 442,
-            author = "R. G. Dromey"
+            author = "R. G. Dromey",
+            imageUrl = null
         ),
         Book(
             isbn = "978-0-13-308501-3",
             title = "Hacker's Delight",
             nbPages = 512,
-            author = "Henry S. Warren, Jr"
+            author = "Henry S. Warren, Jr",
+            imageUrl = null
         ),
         Book(
             isbn = "978-0-13-022418-7",
             title = "Algorithms + Data Structures = Programs",
             nbPages = 366,
-            author = "Niklaus Wirth"
+            author = "Niklaus Wirth",
+            imageUrl = null
         ),
         Book(
             isbn = "978-0-596-00492-7",
             title = "Programming Perl",
             nbPages = 1184,
-            author = "Larry Wall, Randal L. Schwartz, Tom Christiansen, Jon Orwant"
+            author = "Larry Wall, Randal L. Schwartz, Tom Christiansen, Jon Orwant",
+            imageUrl = null
         )
     )
 

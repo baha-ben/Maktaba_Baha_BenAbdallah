@@ -14,27 +14,32 @@ class CategoryRepositoryImpl @Inject constructor() : CategoryRepository {
         Category(
             id = "1",
             name = "Programming",
-            description = "Books about software development and coding"
+            description = "Books about software development and coding",
+            iconRes = android.R.drawable.ic_menu_manage
         ),
         Category(
             id = "2",
             name = "Algorithms",
-            description = "Books about algorithms and data structures"
+            description = "Books about algorithms and data structures",
+            iconRes = android.R.drawable.ic_popup_sync
         ),
         Category(
             id = "3",
             name = "Databases",
-            description = "Books about database design and management"
+            description = "Books about database design and management",
+            iconRes = android.R.drawable.ic_menu_sort_by_size
         ),
         Category(
             id = "4",
             name = "Operating Systems",
-            description = "Books about operating system concepts, processes, memory management, and scheduling"
+            description = "Books about operating system concepts, processes, memory management, and scheduling",
+            iconRes = android.R.drawable.ic_menu_manage
         ),
         Category(
             id = "5",
             name = "Computer Networks",
-            description = "Books about networking concepts, protocols, and communication between computers"
+            description = "Books about networking concepts, protocols, and communication between computers",
+            iconRes = android.R.drawable.ic_dialog_info
         )
     )
 
