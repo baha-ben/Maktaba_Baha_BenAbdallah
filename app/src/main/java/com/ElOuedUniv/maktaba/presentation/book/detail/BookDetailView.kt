@@ -18,9 +18,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
 import com.ElOuedUniv.maktaba.data.model.Book
 import com.ElOuedUniv.maktaba.presentation.book.coverLabel
 import com.ElOuedUniv.maktaba.presentation.book.readingInfo
@@ -99,17 +101,26 @@ private fun BookDetailContent(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(260.dp)
+                .height(360.dp)
                 .clip(RoundedCornerShape(28.dp))
                 .background(MaterialTheme.colorScheme.secondaryContainer),
             contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = book.coverLabel(),
-                style = MaterialTheme.typography.displaySmall,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
-            )
+            if (book.imageUrl != null) {
+                AsyncImage(
+                    model = book.imageUrl,
+                    contentDescription = "Cover of ${book.title}",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Fit
+                )
+            } else {
+                Text(
+                    text = book.coverLabel(),
+                    style = MaterialTheme.typography.displaySmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
         }
 
         Text(
@@ -119,7 +130,8 @@ private fun BookDetailContent(
         )
 
         Text(
-            text = book.author,style = MaterialTheme.typography.titleMedium,
+            text = book.author,
+            style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
