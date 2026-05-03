@@ -23,6 +23,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.ElOuedUniv.maktaba.data.model.Book
@@ -62,25 +63,26 @@ fun BookListView(
             TopAppBar(
                 title = { Text("My Library") },
                 actions = {
+                    IconButton(onClick = {}) {
+                        Icon(Icons.Default.GridView, contentDescription = "Grid View")
+                    }
                     IconButton(onClick = onCategoriesClick) {
-                        Icon(
-                            imageVector = Icons.Default.Menu,
-                            contentDescription = "Categories"
-                        )
+                        Icon(Icons.Default.List, contentDescription = "Categories")
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background
                 )
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = onAddBookClick) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Add Book"
-                )
+            FloatingActionButton(
+                onClick = onAddBookClick,
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+                shape = androidx.compose.foundation.shape.CircleShape
+            ) {
+                Icon(Icons.Default.Add, contentDescription = "Add Book")
             }
         }
     ) { paddingValues ->
@@ -88,6 +90,7 @@ fun BookListView(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
+                .background(MaterialTheme.colorScheme.background)
         ) {
             Text(
                 text = "${uiState.books.size} books • ${uiState.totalPages} pages",
@@ -139,7 +142,7 @@ fun BookListView(
 }
 
 @Composable
-fun BookList(
+fun BookGrid(
     books: List<Book>,
     onBookClick: (String) -> Unit,
     modifier: Modifier = Modifier
@@ -162,7 +165,9 @@ fun BookCard(book: Book, onClick: () -> Unit) {
     val readingInfo = remember(book) { book.readingInfo() }
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(320.dp),
         onClick = onClick,
         shape = RoundedCornerShape(24.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),

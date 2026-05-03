@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ElOuedUniv.maktaba.data.model.Category
 
@@ -35,8 +36,16 @@ fun CategoryListView(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Categories") },
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        "CATEGORIES",
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.ExtraBold,
+                            letterSpacing = 2.sp
+                        )
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(
@@ -45,9 +54,8 @@ fun CategoryListView(
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background
                 )
             )
         }
@@ -56,6 +64,7 @@ fun CategoryListView(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
+                .background(MaterialTheme.colorScheme.background)
         ) {
             Text(
                 text = "Total Categories: ${categories.size}",
@@ -96,8 +105,8 @@ fun CategoryList(
 ) {
     LazyColumn(
         modifier = modifier,
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        contentPadding = PaddingValues(24.dp),
+        verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
         items(categories) { category ->
             CategoryItem(category = category)
@@ -160,7 +169,7 @@ fun EmptyCategoriesMessage(modifier: Modifier = Modifier) {
     ) {
         Text(
             text = "📂",
-            style = MaterialTheme.typography.displayLarge
+            style = MaterialTheme.typography.displayLarge,
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
