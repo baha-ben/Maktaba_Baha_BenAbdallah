@@ -1,9 +1,13 @@
 package com.ElOuedUniv.maktaba.presentation.book.add
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -22,11 +26,13 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -37,6 +43,14 @@ fun AddBookView(
     val uiState by viewModel.uiState.collectAsState()
     val scrollState = rememberScrollState()
 
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.toString()?.let {
+            viewModel.onAction(AddBookUiAction.OnImageSelected(it))
+        }
+    }
+
     LaunchedEffect(uiState.isSuccess) {
         if (uiState.isSuccess) {
             viewModel.onAction(AddBookUiAction.OnNavigationHandled)
@@ -44,7 +58,6 @@ fun AddBookView(
         }
     }
 
-    val scrollState = rememberScrollState()
     val primaryGradient = Brush.linearGradient(
         colors = listOf(
             MaterialTheme.colorScheme.primary,
@@ -89,20 +102,17 @@ fun AddBookView(
                 .padding(padding)
                 .verticalScroll(scrollState)
         ) {
-            // ─── Hero Header ─────────────────────────────────
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(260.dp)
             ) {
-                // Gradient Background
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(primaryGradient)
                 )
 
-                // Decorative circles
                 Box(
                     modifier = Modifier
                         .size(200.dp)
@@ -119,7 +129,6 @@ fun AddBookView(
                         .background(Color.White.copy(alpha = 0.06f))
                 )
 
-                // Cover Image Placeholder
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -136,25 +145,35 @@ fun AddBookView(
                                 width = 1.5.dp,
                                 color = Color.White.copy(alpha = 0.4f),
                                 shape = RoundedCornerShape(24.dp)
-                            ),
+                            )
+                            .clickable { imagePickerLauncher.launch("image/*") },
                         contentAlignment = Alignment.Center
                     ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Add,
-                                contentDescription = null,
-                                tint = Color.White,
-                                modifier = Modifier.size(28.dp)
+                        if (uiState.imageUri != null) {
+                            AsyncImage(
+                                model = uiState.imageUri,
+                                contentDescription = "Book Cover",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
                             )
-                            Text(
-                                text = "Cover",
-                                color = Color.White.copy(alpha = 0.85f),
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Medium
-                            )
+                        } else {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Add,
+                                    contentDescription = null,
+                                    tint = Color.White,
+                                    modifier = Modifier.size(28.dp)
+                                )
+                                Text(
+                                    text = "Cover",
+                                    color = Color.White.copy(alpha = 0.85f),
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
                         }
                     }
 
@@ -178,7 +197,6 @@ fun AddBookView(
                 }
             }
 
-            // ─── Form Card ───────────────────────────────────
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -193,7 +211,6 @@ fun AddBookView(
                         .padding(top = 32.dp, bottom = 24.dp),
                     verticalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
-                    // Section Label
                     Text(
                         text = "Book Details",
                         fontSize = 13.sp,
@@ -202,7 +219,6 @@ fun AddBookView(
                         letterSpacing = 0.8.sp
                     )
 
-                    // Title field
                     StyledTextField(
                         value = uiState.title,
                         onValueChange = { viewModel.onAction(AddBookUiAction.OnTitleChange(it)) },
@@ -211,7 +227,6 @@ fun AddBookView(
                         errorMessage = uiState.titleErrorMessage
                     )
 
-                    // Author field
                     StyledTextField(
                         value = uiState.author,
                         onValueChange = { viewModel.onAction(AddBookUiAction.OnAuthorChange(it)) },
@@ -232,7 +247,6 @@ fun AddBookView(
                         letterSpacing = 0.8.sp
                     )
 
-                    // ISBN field
                     StyledTextField(
                         value = uiState.isbn,
                         onValueChange = { viewModel.onAction(AddBookUiAction.OnIsbnChange(it)) },
@@ -241,7 +255,6 @@ fun AddBookView(
                         errorMessage = uiState.isbnErrorMessage
                     )
 
-                    // Pages field
                     StyledTextField(
                         value = uiState.nbPages,
                         onValueChange = { viewModel.onAction(AddBookUiAction.OnPagesChange(it)) },
@@ -252,7 +265,6 @@ fun AddBookView(
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    // Buttons
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -314,7 +326,6 @@ fun AddBookView(
                         }
                     }
 
-                    // Status hint
                     AnimatedVisibility(
                         visible = !uiState.isFormValid,
                         enter = fadeIn() + expandVertically(),

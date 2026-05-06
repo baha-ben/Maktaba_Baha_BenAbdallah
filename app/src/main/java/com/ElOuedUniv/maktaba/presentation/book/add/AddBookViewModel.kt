@@ -44,6 +44,9 @@ class AddBookViewModel @Inject constructor(
                 }
                 validateInputs()
             }
+            is AddBookUiAction.OnImageSelected -> {
+                _uiState.update { it.copy(imageUri = action.uri) }
+            }
             AddBookUiAction.OnAddClick -> {
                 if (_uiState.value.isFormValid) {
                     addBook()
@@ -53,42 +56,6 @@ class AddBookViewModel @Inject constructor(
                 _uiState.update { it.copy(isSuccess = false) }
             }
         }
-    }
-
-    private fun validateInputs() {
-        val title = _uiState.value.title
-        val isbn = _uiState.value.isbn
-        val nbPages = _uiState.value.nbPages
-
-        val titleError = if (title.isBlank()) "Title cannot be empty" else null
-        val isbnError = if (isbn.length != 13 || isbn.any { !it.isDigit() }) "ISBN must be 13 digits" else null
-        val pagesInt = nbPages.toIntOrNull()
-        val pagesError = if (pagesInt == null || pagesInt <= 0) "Pages must be a positive number" else null
-
-        _uiState.update {
-            it.copy(
-                titleError = titleError,
-                isbnError = isbnError,
-                nbPagesError = pagesError,
-                isFormValid = titleError == null && isbnError == null && pagesError == null
-            )
-        }
-    }
-
-    private fun addBook() {
-        validateInputs()
-        val currentState = _uiState.value
-        if (!currentState.isFormValid) return
-
-        val book = Book(
-            isbn = currentState.isbn,
-            title = currentState.title,
-            nbPages = currentState.nbPages.toIntOrNull() ?: 0,
-            author = currentState.author,
-            imageUrl = null
-        )
-        addBookUseCase(book)
-        _uiState.update { it.copy(isSuccess = true) }
     }
 
     private fun validateInputs() {
@@ -114,5 +81,21 @@ class AddBookViewModel @Inject constructor(
                 isFormValid = titleError == null && isbnError == null && pagesError == null
             )
         }
+    }
+
+    private fun addBook() {
+        validateInputs()
+        val currentState = _uiState.value
+        if (!currentState.isFormValid) return
+
+        val book = Book(
+            isbn = currentState.isbn,
+            title = currentState.title,
+            nbPages = currentState.nbPages.toIntOrNull() ?: 0,
+            author = currentState.author,
+            imageUrl = currentState.imageUri
+        )
+        addBookUseCase(book)
+        _uiState.update { it.copy(isSuccess = true) }
     }
 }

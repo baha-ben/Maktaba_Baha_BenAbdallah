@@ -17,12 +17,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
+import com.ElOuedUniv.maktaba.data.local.OnboardingPreferencesManager
+import kotlinx.coroutines.launch
 
 @Composable
 fun OnboardingView(
     onNavigateToLibrary: () -> Unit,
     viewModel: OnboardingViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
     val backgroundGradient = Brush.linearGradient(
         colors = listOf(
             Color(0xFF6C47FF),
@@ -150,8 +156,11 @@ fun OnboardingView(
             ) {
                 Button(
                     onClick = {
-                        viewModel.onCompleteOnboarding()
-                        onNavigateToLibrary()
+                        coroutineScope.launch {
+                            OnboardingPreferencesManager.setHasCompletedOnboarding(context, true)
+                            viewModel.onCompleteOnboarding()
+                            onNavigateToLibrary()
+                        }
                     },
                     modifier = Modifier
                         .fillMaxWidth()

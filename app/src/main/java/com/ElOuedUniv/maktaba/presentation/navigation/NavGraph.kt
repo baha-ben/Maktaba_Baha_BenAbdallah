@@ -13,11 +13,12 @@ import com.ElOuedUniv.maktaba.presentation.onboarding.OnboardingView
 
 @Composable
 fun NavGraph(
+    startDestination: String,
     navController: NavHostController = rememberNavController()
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.Onboarding.route
+        startDestination = startDestination
     ) {
         composable(Screen.Onboarding.route) {
             OnboardingView(

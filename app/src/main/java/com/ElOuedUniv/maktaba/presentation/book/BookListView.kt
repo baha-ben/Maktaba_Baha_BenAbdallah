@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Apps
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
@@ -64,10 +65,10 @@ fun BookListView(
                 title = { Text("My Library") },
                 actions = {
                     IconButton(onClick = {}) {
-                        Icon(Icons.Default.GridView, contentDescription = "Grid View")
+                        Icon(Icons.Default.Apps, contentDescription = "Grid View")
                     }
                     IconButton(onClick = onCategoriesClick) {
-                        Icon(Icons.Default.List, contentDescription = "Categories")
+                        Icon(Icons.Default.Menu, contentDescription = "Categories")
                     }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
@@ -129,7 +130,7 @@ fun BookListView(
                             modifier = Modifier.align(Alignment.Center)
                         )
                     } else {
-                        BookList(
+                        BookGrid(
                             books = filteredBooks,
                             onBookClick = onBookClick,
                             modifier = Modifier.fillMaxSize()

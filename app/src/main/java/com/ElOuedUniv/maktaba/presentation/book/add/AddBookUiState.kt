@@ -5,15 +5,12 @@ data class AddBookUiState(
     val author: String = "",
     val isbn: String = "",
     val nbPages: String = "",
+    val imageUri: String? = null,
     val isFormValid: Boolean = false,
     val titleErrorMessage: String? = null,
     val isbnErrorMessage: String? = null,
     val pagesErrorMessage: String? = null,
     val isLoading: Boolean = false,
     val isSuccess: Boolean = false,
-    val isFormValid: Boolean = false,
-    val titleError: String? = null,
-    val isbnError: String? = null,
-    val nbPagesError: String? = null,
     val errorMessage: String? = null
 )

@@ -1,5 +1,6 @@
 package com.ElOuedUniv.maktaba.presentation.category
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
